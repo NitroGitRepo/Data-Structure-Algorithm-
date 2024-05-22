@@ -1,0 +1,56 @@
+Given a Directed Acyclic Graph (DAG), the goal is to perform a Topological Sort of the vertices. 
+A Topological Sort is an ordering of the vertices such that for every directed edge uv, vertex u comes before v in the ordering.
+
+----------------------*****-----------------------------------------------
+
+class Solution {
+    // Function to return list containing vertices in Topological order.
+    static int[] topoSort(int V, ArrayList<ArrayList<Integer>> adj) {
+        int inDegree[] = new int[V];
+        
+        // Calculating in-degrees of all vertices
+        for (int i = 0; i < V; i++) {
+            ArrayList<Integer> child = adj.get(i);
+            for (int j = 0; j < child.size(); j++) {
+                inDegree[child.get(j)]++;
+            }
+        }
+        
+        ArrayList<Integer> tempAns = new ArrayList<>();
+        Queue<Integer> qu = new LinkedList<>();
+        
+        // Adding vertices with 0 in-degree to the queue
+        for (int i = 0; i < V; i++) {
+            if (inDegree[i] == 0) {
+                qu.add(i);
+            }
+        }
+        
+        // Processing the queue
+        while (!qu.isEmpty()) {
+            int parent = qu.poll();
+            tempAns.add(parent);
+            ArrayList<Integer> child = adj.get(parent);
+            for (int i = 0; i < child.size(); i++) {
+                inDegree[child.get(i)]--;
+                if (inDegree[child.get(i)] == 0) {
+                    qu.add(child.get(i));
+                }
+            }
+        }
+        
+        int ans[] = new int[tempAns.size()];
+        
+        // Converting the result list to an array
+        for (int i = 0; i < ans.length; i++) {
+            ans[i] = tempAns.get(i);
+        }
+        
+        // Checking if a valid topological sort was found
+        if (ans.length == V) {
+            return ans;
+        } else {
+            return new int[]{-1};
+        }
+    }
+}
