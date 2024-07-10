@@ -1,0 +1,96 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.*;
+//import com.sun.tools.javac.code.Attribute.Array;
+
+class DisjointSet
+{
+    ArrayList<Integer> parent;
+    ArrayList<Integer> size;
+    DisjointSet(int n){
+        parent = new ArrayList<Integer>();
+        size = new ArrayList<Integer>();
+        for(int i=0;i<=n;i++){
+            parent.add(i);
+            size.add(1);
+        }
+    }
+    public int getParent(int node){
+        if(node  == parent.get(node)){
+            return node;
+        }
+        int parentNode = getParent(parent.get(node));
+        parent.set(node, parentNode);
+        return parentNode;
+    }
+    public void unionBySize(int u, int v){
+        int uParent = getParent(u);
+        int vParent = getParent(v);
+        if(uParent == vParent){return;}
+        if(size.get(uParent)<size.get(vParent)){
+            parent.set(uParent, vParent);
+            size.set(vParent, size.get(uParent)+size.get(vParent));
+        }else{
+            parent.set(vParent, uParent);
+            size.set(uParent, size.get(uParent)+size.get(vParent));
+        }
+    }
+
+}
+public class Solution {
+    public static int[] numOfIslandsII(int n, int m, int[][] q) {
+        // Write your code here.
+        DisjointSet ds = new DisjointSet(n*m);
+        int grid[][] = new int[n][m];
+        //Arrays.fill(grid,0);
+        ArrayList<Integer> anstemp = new ArrayList<>();
+        HashSet<Integer> hs = new HashSet<>();
+        for(int k=0;k<q.length;k++){
+            int i = q[k][0];
+            int j = q[k][1];
+
+            //converting 2d index into 1d
+            int current = i*m+j;
+            hs.add(current);
+            grid[i][j] = 1;
+            if(j-1>=0 && grid[i][j-1] == 1){
+                    int left = i*m+(j-1);
+                    int parent = ds.getParent(left);
+                    hs.remove(parent);
+                    hs.remove(ds.getParent(current));
+                    ds.unionBySize(parent, current);
+                    hs.add(ds.getParent(current));
+            }
+            if(j+1<m && grid[i][j+1] == 1){
+                    int right = i*m+(j+1);
+                    int parent = ds.getParent(right);
+                    hs.remove(parent);
+                    hs.remove(ds.getParent(current));
+                    ds.unionBySize(parent, current);
+                    hs.add(ds.getParent(current));
+            }
+            if(i-1>=0 && grid[i-1][j] == 1){
+                     int top = (i-1)*m+j;
+                     int parent = ds.getParent(top);
+                     hs.remove(parent);
+                     hs.remove(ds.getParent(current));
+                     ds.unionBySize(parent,current);
+                     hs.add(ds.getParent(current));
+            }
+            if(i+1<n && grid[i+1][j] == 1){
+                      int bottom = (i+1)*m+j;
+                      int parent = ds.getParent(bottom);
+                      hs.remove(parent);
+                      hs.remove(ds.getParent(current));
+                      ds.unionBySize(parent, current);
+                      hs.add(ds.getParent(current));
+            }   
+            anstemp.add(hs.size());
+        }
+        int []ans = new int[anstemp.size()];
+        for(int i=0;i<ans.length;i++){
+            ans[i] = anstemp.get(i);
+        }
+        return ans;
+    }
+}
